@@ -1,3 +1,4 @@
 # data in the holiday.py needs to be a date (or datetime?)
 # keep using the medium article: https://medium.com/@dushan14/create-a-web-application-with-python-flask-postgresql-and-deploy-on-heroku-243d548335cc
 # better read during the day the test instructions
+# another good link https://www.postgresqltutorial.com/postgresql-insert/#:~:text=Introduction%20to%20PostgreSQL%20INSERT%20statement&text=INSERT%20INTO%20table_name(column1%2C%20column2,%2C%20....%20).

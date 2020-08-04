@@ -5,17 +5,18 @@ class Holiday(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
-    date = db.Column(db.String())
+    date = db.Column(db.Date())
+    ibge_code = db.Column(db.Integer())
 
-    def __init__(self, name, date):
+    def __init__(self, name, date, ibge_code):
         self.name = name
         self.date = date
+        self.ibge_code = ibge_code
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
     
     def serialize(self):
         return {
-            'id': self.id, 
-            'date': self.date
+            'name': self.name
         }
