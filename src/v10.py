@@ -1,4 +1,6 @@
 import os
+import datetime
+import re
 
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -15,10 +17,19 @@ from models import Holiday
 def holiday_methods(ibge_code=None, date=None):
     if (request.method == 'GET'):
         try:
-            holiday = Holiday.query.filter_by(ibge_code=ibge_code).filter_by(date=date).first()
-            return jsonify(holiday.serialize()), 200
-        except Exception as e:
-            return str(e), 404
+            # Check if date is valid
+            datetime.datetime.strptime(date, '%Y-%m-%d')
+            # Check if the ibge_code is valid
+            if(not bool(re.match('^\d{2}$|^\d{7}$', ibge_code))):
+                raise ValueError("Invalid ibge_code")
+            try:
+                holiday = Holiday.query.filter_by(ibge_code=ibge_code).filter_by(date=date).first()
+                return jsonify(holiday.serialize()), 200
+            except AttributeError as e:
+                return str(e), 404
+        except ValueError as e:
+            return str(e), 400
+
     if (request.method == 'PUT'):
         pass
     if (request.method == 'DELETE'):
