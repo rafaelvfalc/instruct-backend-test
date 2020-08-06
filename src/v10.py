@@ -26,6 +26,15 @@ FLEXIBLE_DATE_HOLIDAYS = ["Carnaval", "Pascoa", "Corpus Christi"]
 
 @app.before_first_request
 def add_national_holidays():
+    """
+    Add all national holidays in the database
+
+    Args:
+        None
+
+    Return: 
+        None
+    """
     for index, row in national_holidays_df.iterrows():
         add_update_specific_holiday(row['name'], NATIONAL_HOLIDAY_CODE,
                                     row['date'], "national")
@@ -34,6 +43,17 @@ def add_national_holidays():
 @app.route(
     "/feriados/<ibge_code>/<holiday_info>/", methods=["GET", "PUT", "DELETE"])
 def holiday_methods(ibge_code=None, holiday_info=None):
+    """
+    Setup of all holiday routes and methods of the api
+
+    Args:
+        ibge_code (string): IBGE code
+        holiday_info (string): Data that might have a holiday date or
+                               holiday name
+
+    Return: 
+        (Message, code): Return the message result of the deletion and the http code
+    """
     if (request.method == 'GET'):
         date = holiday_info
         return get_holiday(ibge_code, date)
@@ -53,7 +73,18 @@ def holiday_methods(ibge_code=None, holiday_info=None):
             date = holiday_info
             return delete_holiday(ibge_code, date)
 
+
 def get_holiday(ibge_code, date):
+    """
+    Gets a holiday
+
+    Args:
+        ibge_code (string): IBGE code
+        date (string): Data that might have a holiday
+
+    Return: 
+        (Message, code): Return the message result of the get method and the http code
+    """
     try:
         # Check if date is valid
         datetime.strptime(date, '%Y-%m-%d')
@@ -91,6 +122,17 @@ def get_holiday(ibge_code, date):
 
 
 def add_update_holiday(name, ibge_code, date):
+    """
+    Add or update a holiday
+
+    Args:
+        name (string): Name of the holiday
+        ibge_code (string): IBGE code
+        date (string): Data that might have a holiday
+
+    Return: 
+        (Message, code): Return the message result of the addition/update and the http code
+    """
     try:
         # Check if date is valid
         datetime.strptime(date, '%m-%d')
@@ -112,6 +154,18 @@ def add_update_holiday(name, ibge_code, date):
 
 
 def add_update_state_holiday(name, ibge_code, date, type_):
+    """
+    Add or update a state holiday
+
+    Args:
+        name (string): Name of the holiday
+        ibge_code (string): IBGE code
+        date (string): Data that might have a holiday
+        type_ (string): Type of the holiday
+
+    Return: 
+        (Message, code): Return the message result of the addition or update and the http code
+    """
     return_code = add_update_specific_holiday(name, ibge_code, date, type_)
     # If the state holiday was created or updated, add the reference to its towns
     if (return_code[1] == 200 or return_code[1] == 201):
@@ -125,6 +179,18 @@ def add_update_state_holiday(name, ibge_code, date, type_):
 
 
 def add_update_specific_holiday(name, ibge_code, date, type_):
+    """
+    Add or update a specific holiday
+
+    Args:
+        name (string): Name of the holiday
+        ibge_code (string): IBGE code
+        date (string): Data that might have a holiday
+        type_ (string): Type of the holiday
+
+    Return: 
+        (Message, code): Return the message result of the addition or update and the http code
+    """
     holiday = Holiday.query.filter_by(ibge_code=ibge_code).filter_by(
         date=date).first()
     if (holiday is None or type_ == 'flexible-date'):
@@ -145,6 +211,16 @@ def add_update_specific_holiday(name, ibge_code, date, type_):
 
 
 def delete_holiday(ibge_code, date):
+    """
+    Delete a specific holiday
+
+    Args:
+        ibge_code (string): IBGE code
+        date (string): Data that might have a holiday
+
+    Return: 
+        (Message, code): Return the message result of the deletion and the http code
+    """
     try:
         # Check if date is valid
         datetime.strptime(date, '%m-%d')
@@ -165,6 +241,17 @@ def delete_holiday(ibge_code, date):
 
 
 def delete_state_holiday(ibge_code, date, type_):
+    """
+    Delete a state holiday
+
+    Args:
+        ibge_code (string): IBGE code
+        date (string): Data that might have a holiday
+        type_ (string): Type of the holiday
+
+    Return: 
+        (Message, code): Return the message result of the deletion and the http code
+    """
     return_code = delete_specific_holiday(ibge_code, date, type_)
     # If the state holiday was deleted, delete the reference to its towns
     if (return_code[1] == 204):
@@ -178,6 +265,20 @@ def delete_state_holiday(ibge_code, date, type_):
 
 
 def delete_specific_holiday(ibge_code, date, type_, flexible_holiday_name=""):
+    """
+    Delete a specific holiday
+
+    Args:
+        ibge_code (string): IBGE code
+        date (string): Data that might have a holiday
+        type_ (string): Type of the holiday
+        flexible_holiday_name (string): If the holiday that will be deleted
+                                        is a flexible date one, this variable 
+                                        get its name.
+
+    Return: 
+        (Message, code): Return the message result of the deletion and the http code
+    """
     # Check if it is a flexible date holiday
     try:
         holiday = Holiday.query.filter_by(ibge_code=ibge_code).filter_by(
@@ -212,6 +313,16 @@ def delete_specific_holiday(ibge_code, date, type_, flexible_holiday_name=""):
 
 
 def get_national_holiday(date):
+    """
+    Gets a national holiday
+
+    Args:
+        date (string): Data that might have a holiday
+
+    Return: 
+        Holiday: Return the holiday object of the date if exists
+                 None otherwise.
+    """
     # Check Holy Friday special case
     year = date.split("-")[0]
     holy_friday_date = str(
@@ -229,6 +340,16 @@ def get_national_holiday(date):
 
 
 def add_date_flexible_holiday(holiday_name, ibge_code):
+    """
+    Add a data flexible holiday
+
+    Args:
+        holiday_name (string): The name of the holiday that will be deleted
+        ibge_code (string): IBGE code of the town
+
+    Return: 
+        (Message, code): Return the message result of the addition and the http code
+    """
     # Check if the ibge_code is valid town code
     try:
         if (not bool(re.match('^\d{7}$', ibge_code))):
@@ -240,6 +361,16 @@ def add_date_flexible_holiday(holiday_name, ibge_code):
 
 
 def delete_date_flexible_holiday(holiday_name, ibge_code):
+    """
+    Delete a data flexible holiday
+
+    Args:
+        holiday_name (string): The name of the holiday that will be deleted
+        ibge_code (string): IBGE code of the town
+
+    Return: 
+        (Message, code): Return the message result of the deletion and the http code
+    """
     # Check if the ibge_code is valid town code
     try:
         if (not bool(re.match('^\d{7}$', ibge_code))):
@@ -251,6 +382,17 @@ def delete_date_flexible_holiday(holiday_name, ibge_code):
 
 
 def get_flexible_date_holiday(ibge_code, date):
+    """
+    Gets a data flexible holiday
+
+    Args:
+        ibge (string): IBGE code of the town
+        date (string): Data that might have a holiday
+
+    Return: 
+        Holiday: Return the holiday object of the date if exists
+                 None otherwise.
+    """
     year = date.split("-")[0]
     holidays = Holiday.query.filter_by(ibge_code=ibge_code).filter_by(
         type_="flexible-date").all()
