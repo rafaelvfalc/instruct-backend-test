@@ -1,5 +1,8 @@
 from v10 import db
 
+"""
+    Definition of a Holiday object model in the database
+"""
 class Holiday(db.Model):
     __tablename__ = 'holidays'
 
