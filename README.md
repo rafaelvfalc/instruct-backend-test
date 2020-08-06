@@ -31,7 +31,6 @@ $ pip install -r requirements.txt
 
 ### 5. Create all required environment variables
 ```bash
-$ cd src
 $ source .env
 ```
 

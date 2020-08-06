@@ -1,4 +1,4 @@
 .vscode
 venv
-src/migrations
-src/__pycache__/ 
+migrations
+__pycache__/ 
